@@ -1,0 +1,112 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    depends_on: [zookeeper]
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  auth:
+    build: ./services/auth
+    ports:
+      - "5000:5000"
+    depends_on: [kafka, redis]
+    env_file: ./services/auth/.env
+    environment:
+      Kafka_Broker: kafka:9092
+      Redis_url: redis://redis:6379
+
+  utils:
+    build: ./services/utils
+    ports:
+      - "5001:5001"
+    depends_on: [kafka]
+    env_file: ./services/utils/.env
+    environment:
+      Kafka_Broker: kafka:9092
+
+  user:
+    build: ./services/user
+    ports:
+      - "5002:5002"
+    env_file: ./services/user/.env
+
+  job:
+    build: ./services/job
+    ports:
+      - "5003:5003"
+    depends_on: [kafka, redis]
+    env_file: ./services/job/.env
+    environment:
+      Kafka_Broker: kafka:9092
+      Redis_url: redis://redis:6379
+
+  payment:
+    build: ./services/payment
+    ports:
+      - "5004:5004"
+    env_file: ./services/payment/.env
+
+  tracker:
+    build: ./services/tracker
+    ports:
+      - "5005:5005"
+    depends_on: [redis]
+    env_file: ./services/tracker/.env
+    environment:
+      Redis_url: redis://redis:6379
+
+  questions:
+    build: ./services/questions
+    ports:
+      - "5006:5006"
+    env_file: ./services/questions/.env
+
+  feed:
+    build: ./services/feed
+    ports:
+      - "5007:5007"
+    depends_on: [redis]
+    env_file: ./services/feed/.env
+    environment:
+      Redis_url: redis://redis:6379
+
+  insights:
+    build: ./services/insights
+    ports:
+      - "5008:5008"
+    env_file: ./services/insights/.env
+
+  referral:
+    build: ./services/referral
+    ports:
+      - "5009:5009"
+    env_file: ./services/referral/.env
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on: [auth, utils, user, job, payment]
+    environment:
+      NEXT_PUBLIC_AUTH_SERVICE: http://localhost:5000
+      NEXT_PUBLIC_UTILS_SERVICE: http://localhost:5001
+      NEXT_PUBLIC_USER_SERVICE: http://localhost:5002
+      NEXT_PUBLIC_JOB_SERVICE: http://localhost:5003
+      NEXT_PUBLIC_PAYMENT_SERVICE: http://localhost:5004
