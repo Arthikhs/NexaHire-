@@ -105,7 +105,7 @@ export const sendMessage = TryCatch(async (req: AuthenticatedRequest, res) => {
 
   await sql`UPDATE conversations SET last_message = ${content.trim()}, last_message_at = NOW() WHERE conversation_id = ${conversation_id}`;
 
-  res.status(201).json({ message: "Sent", message });
+  res.status(201).json({ message: "Sent", data: message });
 });
 
 // GET /api/messaging/users/search?q=...
