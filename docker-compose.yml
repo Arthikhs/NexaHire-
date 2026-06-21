@@ -72,11 +72,11 @@ services:
     environment:
       Redis_url: redis://redis:6379
 
-  questions:
-    build: ./services/questions
+  insights:
+    build: ./services/insights
     ports:
       - "5006:5006"
-    env_file: ./services/questions/.env
+    env_file: ./services/insights/.env
 
   feed:
     build: ./services/feed
@@ -87,11 +87,11 @@ services:
     environment:
       Redis_url: redis://redis:6379
 
-  insights:
-    build: ./services/insights
+  questions:
+    build: ./services/questions
     ports:
       - "5008:5008"
-    env_file: ./services/insights/.env
+    env_file: ./services/questions/.env
 
   referral:
     build: ./services/referral
@@ -99,14 +99,33 @@ services:
       - "5009:5009"
     env_file: ./services/referral/.env
 
+  opensource:
+    build: ./services/opensource
+    ports:
+      - "5010:5010"
+    env_file: ./services/opensource/.env
+
+  messaging:
+    build: ./services/messaging
+    ports:
+      - "5011:5011"
+    env_file: ./services/messaging/.env
+
   frontend:
     build: ./frontend
     ports:
       - "3000:3000"
-    depends_on: [auth, utils, user, job, payment]
+    depends_on: [auth, utils, user, job, payment, tracker, insights, feed, questions, referral, opensource, messaging]
     environment:
-      NEXT_PUBLIC_AUTH_SERVICE: http://localhost:5000
-      NEXT_PUBLIC_UTILS_SERVICE: http://localhost:5001
-      NEXT_PUBLIC_USER_SERVICE: http://localhost:5002
-      NEXT_PUBLIC_JOB_SERVICE: http://localhost:5003
-      NEXT_PUBLIC_PAYMENT_SERVICE: http://localhost:5004
+      NEXT_PUBLIC_AUTH_SERVICE: http://3.110.22.108:5000
+      NEXT_PUBLIC_UTILS_SERVICE: http://3.110.22.108:5001
+      NEXT_PUBLIC_USER_SERVICE: http://3.110.22.108:5002
+      NEXT_PUBLIC_JOB_SERVICE: http://3.110.22.108:5003
+      NEXT_PUBLIC_PAYMENT_SERVICE: http://3.110.22.108:5004
+      NEXT_PUBLIC_TRACKER_SERVICE: http://3.110.22.108:5005
+      NEXT_PUBLIC_INSIGHTS_SERVICE: http://3.110.22.108:5006
+      NEXT_PUBLIC_FEED_SERVICE: http://3.110.22.108:5007
+      NEXT_PUBLIC_QUESTIONS_SERVICE: http://3.110.22.108:5008
+      NEXT_PUBLIC_REFERRAL_SERVICE: http://3.110.22.108:5009
+      NEXT_PUBLIC_OPENSOURCE_SERVICE: http://3.110.22.108:5010
+      NEXT_PUBLIC_MESSAGING_SERVICE: http://3.110.22.108:5011
