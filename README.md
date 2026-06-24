@@ -370,3 +370,7 @@ MIT License — feel free to use, modify and distribute.
   <strong>⭐ Star this repo if you found it helpful!</strong><br/>
   Built with ❤️ using Next.js, Node.js & Apache Kafka
 </div>
+<div align="center">
+  <strong>⭐ Star this repo if you found it helpful!</strong><br/>
+  Built with ❤️ using Next.js, Node.js & Apache Kafka
+</div>
