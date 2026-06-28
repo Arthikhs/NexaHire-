@@ -586,6 +586,64 @@ Write a professional, personalized cover letter. Return ONLY valid JSON. No mark
   } catch (error: any) { res.status(500).json({ message: error.message }); }
 });
 
+router.post("/salary-predictor", async (req, res) => {
+  try {
+    const { skills, experience, role, location, education } = req.body;
+    if (!skills || !role) {
+      return res.status(400).json({ message: "skills and role are required" });
+    }
+    const prompt = `You are an expert compensation analyst with deep knowledge of the Indian and global tech job market.
+
+Candidate Profile:
+- Role: ${role}
+- Skills: ${skills}
+- Experience: ${experience || "Fresher"}
+- Location: ${location || "India"}
+- Education: ${education || "Not specified"}
+
+Predict the salary and return ONLY valid JSON. No markdown.
+
+{
+  "predictedSalary": {
+    "min": 800000,
+    "max": 1200000,
+    "median": 1000000,
+    "currency": "INR",
+    "period": "per annum"
+  },
+  "formattedRange": "₹8 LPA – ₹12 LPA",
+  "confidenceScore": 85,
+  "summary": "Brief explanation of the salary prediction",
+  "salaryByExperience": [
+    { "level": "Fresher (0-1 yr)", "range": "₹4–6 LPA" },
+    { "level": "Junior (1-3 yrs)", "range": "₹6–10 LPA" },
+    { "level": "Mid (3-6 yrs)", "range": "₹10–18 LPA" },
+    { "level": "Senior (6+ yrs)", "range": "₹18–35 LPA" }
+  ],
+  "topPayingCompanies": [
+    { "company": "Google", "range": "₹25–60 LPA" },
+    { "company": "Microsoft", "range": "₹20–50 LPA" },
+    { "company": "Amazon", "range": "₹18–45 LPA" }
+  ],
+  "salaryBoostingSkills": [
+    { "skill": "Kubernetes", "boostPercent": 20 },
+    { "skill": "System Design", "boostPercent": 15 }
+  ],
+  "locationImpact": [
+    { "city": "Bangalore", "multiplier": "1.3x" },
+    { "city": "Hyderabad", "multiplier": "1.2x" },
+    { "city": "Pune", "multiplier": "1.0x" }
+  ],
+  "marketDemand": "High / Medium / Low",
+  "tip": "One actionable tip to increase salary"
+}`;
+    const response = await ai.models.generateContent({ model: "gemini-1.5-flash", contents: prompt });
+    const rawText = response.text?.replace(/```json/g, "").replace(/```/g, "").trim();
+    if (!rawText) throw new Error("No response");
+    res.json(JSON.parse(rawText));
+  } catch (error: any) { res.status(500).json({ message: error.message }); }
+});
+
 router.post("/interview-feedback", async (req, res) => {
   try {
     const { role, round, questions } = req.body;
