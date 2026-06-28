@@ -519,4 +519,112 @@ Return ONLY valid JSON array. No markdown.
   } catch (error: any) { res.status(500).json({ message: error.message }); }
 });
 
+router.post("/job-match", async (req, res) => {
+  try {
+    const { candidateSkills, candidateExperience, jobDescription, jobTitle } = req.body;
+    if (!candidateSkills || !jobDescription) {
+      return res.status(400).json({ message: "candidateSkills and jobDescription are required" });
+    }
+    const prompt = `You are an expert recruiter and ATS specialist.
+
+Candidate Profile:
+- Skills: ${candidateSkills}
+- Experience: ${candidateExperience || "Not specified"}
+
+Job Title: ${jobTitle || "Not specified"}
+Job Description: ${jobDescription}
+
+Analyze how well this candidate matches the job. Return ONLY valid JSON. No markdown.
+
+{
+  "matchScore": 78,
+  "summary": "Brief summary of the match",
+  "matchedSkills": ["skill1", "skill2"],
+  "missingSkills": ["skill1", "skill2"],
+  "strengths": ["strength1", "strength2"],
+  "weaknesses": ["weakness1", "weakness2"],
+  "recommendation": "Should apply / Strong match / Needs improvement",
+  "tips": ["tip to improve match score"]
+}`;
+    const response = await ai.models.generateContent({ model: "gemini-1.5-flash", contents: prompt });
+    const rawText = response.text?.replace(/```json/g, "").replace(/```/g, "").trim();
+    if (!rawText) throw new Error("No response");
+    res.json(JSON.parse(rawText));
+  } catch (error: any) { res.status(500).json({ message: error.message }); }
+});
+
+router.post("/cover-letter", async (req, res) => {
+  try {
+    const { jobTitle, companyName, jobDescription, candidateName, candidateSkills, candidateExperience } = req.body;
+    if (!jobTitle || !jobDescription || !candidateName) {
+      return res.status(400).json({ message: "jobTitle, jobDescription and candidateName are required" });
+    }
+    const prompt = `You are an expert cover letter writer.
+
+Job Title: ${jobTitle}
+Company: ${companyName || "the company"}
+Job Description: ${jobDescription}
+
+Candidate:
+- Name: ${candidateName}
+- Skills: ${candidateSkills || "Not specified"}
+- Experience: ${candidateExperience || "Not specified"}
+
+Write a professional, personalized cover letter. Return ONLY valid JSON. No markdown.
+
+{
+  "subject": "Email subject line",
+  "coverLetter": "Full cover letter text with paragraphs separated by \\n\\n",
+  "keyHighlights": ["highlight1", "highlight2", "highlight3"],
+  "tone": "Professional/Enthusiastic/Creative",
+  "wordCount": 280
+}`;
+    const response = await ai.models.generateContent({ model: "gemini-1.5-flash", contents: prompt });
+    const rawText = response.text?.replace(/```json/g, "").replace(/```/g, "").trim();
+    if (!rawText) throw new Error("No response");
+    res.json(JSON.parse(rawText));
+  } catch (error: any) { res.status(500).json({ message: error.message }); }
+});
+
+router.post("/interview-feedback", async (req, res) => {
+  try {
+    const { role, round, questions } = req.body;
+    if (!questions || !Array.isArray(questions) || questions.length === 0) {
+      return res.status(400).json({ message: "questions array is required" });
+    }
+    const prompt = `You are an expert interview coach with 15+ years of experience.
+
+Role: ${role || "Software Engineer"}
+Interview Round: ${round || "General"}
+
+Candidate's Interview Responses:
+${questions.map((q: { question: string; answer: string }, i: number) => `Q${i + 1}: ${q.question}\nA${i + 1}: ${q.answer}`).join("\n\n")}
+
+Analyze each answer and provide detailed feedback. Return ONLY valid JSON. No markdown.
+
+{
+  "overallScore": 75,
+  "overallFeedback": "General assessment of the interview performance",
+  "questionFeedback": [
+    {
+      "question": "The question",
+      "score": 80,
+      "feedback": "Detailed feedback on the answer",
+      "whatWasGood": "What the candidate did well",
+      "improvement": "What could be improved",
+      "idealAnswer": "Key points of an ideal answer"
+    }
+  ],
+  "strengths": ["strength1", "strength2"],
+  "areasToImprove": ["area1", "area2"],
+  "nextSteps": ["action1", "action2"],
+  "verdict": "Strong Pass / Pass / Borderline / Fail"
+}`;
+    const response = await ai.models.generateContent({ model: "gemini-1.5-flash", contents: prompt });
+    const rawText = response.text?.replace(/```json/g, "").replace(/```/g, "").trim();
+    if (!rawText) throw new Error("No response");
+    res.json(JSON.parse(rawText));
+  } catch (error: any) { res.status(500).json({ message: error.message }); }
+});
+
 export default router;

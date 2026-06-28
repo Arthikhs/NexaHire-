@@ -1,4 +1,4 @@
-# 🚀 NexaHire –Job Portal (Microservices)
+# 🚀 NexaHire – Job Portal (Microservices)
 
 A production-grade **Job Portal** built with **Microservices Architecture** where all services communicate through **Apache Kafka**. NexaHire offers 20+ features including AI mock interviews, resume analysis, real-time messaging, skill endorsements, job alerts, open source hub and much more.
 

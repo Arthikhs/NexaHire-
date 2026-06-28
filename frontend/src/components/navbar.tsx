@@ -2,7 +2,7 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { Bell, Bookmark, BarChart3, Briefcase, CheckCheck, Home, Info, LogOut, Menu, MessageSquarePlus, User, X, KanbanSquare, Building2, BookOpen, Target } from "lucide-react";
+import { Bell, Bookmark, BarChart3, Briefcase, CheckCheck, Home, Info, LogOut, Menu, MessageSquarePlus, User, X, KanbanSquare, Building2, BookOpen, Target, FileEdit, Mic } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./mode-toggle";
@@ -196,6 +196,12 @@ const NavBar = () => {
                         </Link>
                         <Link href={"/skill-gap"}>
                           <Button className="w-full justify-start gap-2" variant="ghost"><Target size={16} /> Skill Gap</Button>
+                        </Link>
+                        <Link href={"/cover-letter"}>
+                          <Button className="w-full justify-start gap-2" variant="ghost"><FileEdit size={16} /> Cover Letter</Button>
+                        </Link>
+                        <Link href={"/interview-feedback"}>
+                          <Button className="w-full justify-start gap-2" variant="ghost"><Mic size={16} /> Interview Feedback</Button>
                         </Link>
                         <Link href={"/saved"}>
                           <Button className="w-full justify-start gap-2" variant="ghost"><Bookmark size={16} /> Saved Jobs</Button>

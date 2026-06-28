@@ -2,7 +2,7 @@
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { job_service, useAppData } from "@/context/AppContext";
+import { job_service, utils_service, useAppData } from "@/context/AppContext";
 import { Application, Job } from "@/type";
 import axios from "axios";
 import {
@@ -21,6 +21,7 @@ import {
   Laptop,
   MapPin,
   Share2,
+  Sparkles,
   Users,
   XCircle,
 } from "lucide-react";
@@ -42,6 +43,9 @@ const JobPage = () => {
   const [jobApplications, setJobApplications] = useState<Application[]>([]);
   const [filterStatus, setFilterStatus] = useState("All");
   const [value, setValue] = useState("");
+
+  const [matchResult, setMatchResult] = useState<any>(null);
+  const [matchLoading, setMatchLoading] = useState(false);
 
   const isSaved = job ? savedJobIds?.has(job.job_id) : false;
 
@@ -102,6 +106,23 @@ const JobPage = () => {
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     toast.success("Link copied to clipboard!");
+  };
+
+  const checkJobMatch = async () => {
+    if (!user?.skills?.length || !job) return;
+    setMatchLoading(true);
+    try {
+      const { data } = await axios.post(`${utils_service}/api/utils/job-match`, {
+        candidateSkills: user.skills.join(", "),
+        jobDescription: job.description,
+        jobTitle: job.title,
+      });
+      setMatchResult(data);
+    } catch {
+      toast.error("Failed to analyze match");
+    } finally {
+      setMatchLoading(false);
+    }
   };
 
   if (loading) return <Loading />;
@@ -317,6 +338,87 @@ const JobPage = () => {
                   </div>
                 ))}
               </Card>
+
+              {/* AI Job Match Score */}
+              {user && user.role === "jobseeker" && (
+                <Card className="border-2 p-6 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={18} className="text-purple-500" />
+                    <h3 className="font-bold text-base">AI Job Match</h3>
+                  </div>
+
+                  {!matchResult ? (
+                    <>
+                      <p className="text-xs opacity-60">See how well your profile matches this job using AI.</p>
+                      <Button
+                        onClick={checkJobMatch}
+                        disabled={matchLoading || !user.skills?.length}
+                        className="w-full gap-2 bg-purple-600 hover:bg-purple-700"
+                      >
+                        <Sparkles size={15} />
+                        {matchLoading ? "Analyzing..." : "Check My Match"}
+                      </Button>
+                      {!user.skills?.length && (
+                        <p className="text-xs text-red-500">Add skills to your profile to use this feature.</p>
+                      )}
+                    </>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* Score ring */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Match Score</span>
+                        <span className={`text-2xl font-bold ${
+                          matchResult.matchScore >= 75 ? "text-green-500"
+                          : matchResult.matchScore >= 50 ? "text-yellow-500"
+                          : "text-red-500"
+                        }`}>{matchResult.matchScore}%</span>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-2.5">
+                        <div
+                          className={`h-2.5 rounded-full transition-all ${
+                            matchResult.matchScore >= 75 ? "bg-green-500"
+                            : matchResult.matchScore >= 50 ? "bg-yellow-500"
+                            : "bg-red-500"
+                          }`}
+                          style={{ width: `${matchResult.matchScore}%` }}
+                        />
+                      </div>
+
+                      <p className="text-xs opacity-70">{matchResult.summary}</p>
+
+                      <div className="px-3 py-2 rounded-lg text-xs font-semibold text-center bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                        {matchResult.recommendation}
+                      </div>
+
+                      {matchResult.matchedSkills?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-semibold text-green-600 mb-1">✓ Matched Skills</p>
+                          <div className="flex flex-wrap gap-1">
+                            {matchResult.matchedSkills.map((s: string) => (
+                              <span key={s} className="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs">{s}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {matchResult.missingSkills?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-semibold text-red-500 mb-1">✗ Missing Skills</p>
+                          <div className="flex flex-wrap gap-1">
+                            {matchResult.missingSkills.map((s: string) => (
+                              <span key={s} className="px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs">{s}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <button onClick={() => setMatchResult(null)} className="text-xs opacity-50 hover:opacity-100 transition-opacity w-full text-center">
+                        Re-analyze
+                      </button>
+                    </div>
+                  )}
+                </Card>
+              )}
 
               {/* Company card */}
               <Card className="border-2 p-6">
