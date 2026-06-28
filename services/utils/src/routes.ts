@@ -644,6 +644,49 @@ Predict the salary and return ONLY valid JSON. No markdown.
   } catch (error: any) { res.status(500).json({ message: error.message }); }
 });
 
+router.post("/resume-score", async (req, res) => {
+  try {
+    const { pdfBase64, jobDescription } = req.body;
+    if (!pdfBase64 || !jobDescription) {
+      return res.status(400).json({ message: "pdfBase64 and jobDescription are required" });
+    }
+    const prompt = `You are an expert ATS recruiter. Score this resume against the job description.
+Job Description: ${jobDescription}
+Return ONLY valid JSON. No markdown.
+{
+  "overallScore": 82,
+  "summary": "Brief assessment of how well the resume matches the job",
+  "scoreBreakdown": {
+    "keywordMatch": { "score": 85, "feedback": "Feedback on keyword alignment" },
+    "experienceMatch": { "score": 80, "feedback": "Feedback on experience relevance" },
+    "skillsMatch": { "score": 90, "feedback": "Feedback on skills alignment" },
+    "educationMatch": { "score": 75, "feedback": "Feedback on education fit" }
+  },
+  "matchedKeywords": ["keyword1", "keyword2"],
+  "missingKeywords": ["keyword1", "keyword2"],
+  "strengths": ["strength1", "strength2"],
+  "improvements": [
+    { "issue": "Issue description", "fix": "How to fix it", "priority": "high/medium/low" }
+  ],
+  "verdict": "Excellent Match / Good Match / Partial Match / Poor Match",
+  "recommendation": "Should apply / Tailor resume first / Significant changes needed"
+}`;
+    const response = await ai.models.generateContent({
+      model: "gemini-1.5-flash",
+      contents: [{
+        role: "user",
+        parts: [
+          { text: prompt },
+          { inlineData: { mimeType: "application/pdf", data: pdfBase64.replace(/^data:application\/pdf;base64,/, "") } },
+        ],
+      }],
+    });
+    const rawText = response.text?.replace(/```json/g, "").replace(/```/g, "").trim();
+    if (!rawText) throw new Error("No response");
+    res.json(JSON.parse(rawText));
+  } catch (error: any) { res.status(500).json({ message: error.message }); }
+});
+
 router.post("/interview-feedback", async (req, res) => {
   try {
     const { role, round, questions } = req.body;
