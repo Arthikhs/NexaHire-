@@ -26,11 +26,13 @@ services:
     build: ./services/auth
     ports:
       - "5000:5000"
-    depends_on: [kafka, redis]
+    depends_on: [kafka, redis, utils]
     env_file: ./services/auth/.env
     environment:
       Kafka_Broker: kafka:9092
       Redis_url: redis://redis:6379
+      UPLOAD_SERVICE: http://utils:5001
+      Frontend_Url: http://3.110.22.108:3000
 
   utils:
     build: ./services/utils
@@ -45,17 +47,21 @@ services:
     build: ./services/user
     ports:
       - "5002:5002"
+    depends_on: [utils]
     env_file: ./services/user/.env
+    environment:
+      UPLOAD_SERVICE: http://utils:5001
 
   job:
     build: ./services/job
     ports:
       - "5003:5003"
-    depends_on: [kafka, redis]
+    depends_on: [kafka, redis, utils]
     env_file: ./services/job/.env
     environment:
       Kafka_Broker: kafka:9092
       Redis_url: redis://redis:6379
+      UPLOAD_SERVICE: http://utils:5001
 
   payment:
     build: ./services/payment
