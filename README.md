@@ -34,6 +34,7 @@ A production-grade **Job Portal** built with **Microservices Architecture** wher
 - [Troubleshooting](#️-troubleshooting)
 - [What You Will Learn](#-what-you-will-learn)
 - [Built With](#-built-with)
+- [Interview Questions](#-interview-questions)
 - [License](#-license)
 
 ---
@@ -522,6 +523,65 @@ in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software.
 ```
+
+---
+
+## ❓ Interview Questions
+
+Common questions asked about this project in interviews:
+
+### ☁️ Cloudinary Questions
+
+| # | Question | Answer |
+|---|----------|--------|
+| 1 | How do I get Cloudinary credentials? | Sign up at cloudinary.com → Dashboard → copy CLOUD_NAME, API_KEY, API_SECRET |
+| 2 | Why is Cloudinary only in utils service? | Centralized upload service — all other services call `/api/utils/upload` via HTTP |
+| 3 | What is `UPLOAD_SERVICE` env variable? | Points to utils service URL `http://localhost:5001` |
+| 4 | How does file go from frontend to Cloudinary? | Frontend → multipart/form-data → Service → base64 buffer → POST /api/utils/upload → Cloudinary |
+| 5 | Why convert file to base64 before uploading? | Services communicate via HTTP JSON — base64 allows binary files to be sent as JSON string |
+| 6 | What is `public_id` used for? | Unique identifier of file in Cloudinary — used to delete old file before uploading new one |
+| 7 | How to delete old image when uploading new one? | Pass `public_id` in request body — upload route calls `cloudinary.v2.uploader.destroy(public_id)` first |
+| 8 | What does `secure_url` return? | HTTPS URL of the uploaded file hosted on Cloudinary CDN |
+| 9 | Can PDFs and images use same upload endpoint? | Yes — `/api/utils/upload` handles all file types |
+| 10 | What is the file size limit? | 50mb — set in `express.json({ limit: "50mb" })` in utils `index.ts` |
+| 11 | Why `Cloudinary upload error`? | Check `CLOUD_NAME`, `API_KEY`, `API_SECRET` are correct in `services/utils/.env` |
+| 12 | Which services use Cloudinary? | `auth` (profile photo), `user` (profile photo), `job` (company logo) |
+
+---
+
+### 🧪 Testing Questions (Node.js)
+
+| # | Question | Answer |
+|---|----------|--------|
+| 1 | Can JUnit + Mockito be used in this project? | No — JUnit & Mockito are Java frameworks. This project uses Node.js + TypeScript |
+| 2 | What is the Node.js equivalent of JUnit? | **Jest** — test runner + assertions |
+| 3 | What is the Node.js equivalent of Mockito? | **Jest mocks** — `jest.fn()`, `jest.spyOn()` |
+| 4 | What is equivalent of Mockito `when().thenReturn()`? | `jest.fn().mockResolvedValue()` for async mocks |
+| 5 | What is equivalent of JUnit `@BeforeEach`? | `beforeEach()` in Jest |
+| 6 | What library is used for HTTP endpoint testing? | **Supertest** — used with Jest to test Express routes |
+| 7 | How to mock Cloudinary in tests? | `jest.spyOn(cloudinary.v2.uploader, "upload").mockResolvedValue({ secure_url, public_id })` |
+
+---
+
+### 🏗️ Architecture Questions
+
+| # | Question | Answer |
+|---|----------|--------|
+| 1 | What architecture does NexaHire use? | Microservices architecture — 12 independent services |
+| 2 | How do services communicate? | Apache Kafka for async events + HTTP REST for direct calls |
+| 3 | Why use Kafka instead of direct HTTP calls? | Decoupling, fault tolerance, async processing — e.g. email sending doesn't block auth service |
+| 4 | Which services produce Kafka messages? | `auth` and `job` services produce to `send-mail` topic |
+| 5 | Which service consumes Kafka messages? | `utils` service consumes and sends emails via Nodemailer |
+| 6 | Why is JWT_SEC same across all services? | All services need to verify the same JWT token issued by auth service |
+| 7 | What is the role of utils service? | Centralized service for Cloudinary uploads, AI (Gemini), and email sending |
+| 8 | Why use Redis in this project? | Caching job listings and auth sessions — reduces DB load and improves response time |
+| 9 | Can the backend be rewritten in Java/Spring Boot? | Technically yes, but not recommended — massive effort to rewrite 12 services |
+| 10 | Why Next.js over plain React.js? | SEO (job listings need to be indexed), App Router, Server Components, built-in routing |
+| 11 | What is the frontend framework? | Next.js 16 with TypeScript, Tailwind CSS and ShadCN UI |
+| 12 | Can frontend be converted from TypeScript to JavaScript? | Yes, but not recommended — TypeScript catches bugs at compile time, already fully set up |
+| 13 | How many microservices does NexaHire have? | 12 backend services + 1 frontend = 13 total |
+| 14 | What port does each service run on? | Frontend: 3000, Auth: 5000, Utils: 5001, User: 5002 ... Messaging: 5011 |
+| 15 | What database does this project use? | PostgreSQL via NeonDB (serverless, free tier) |
 
 ---
 
