@@ -9,6 +9,20 @@ const redisClient = createClient({ url: process.env.Redis_url });
 
 redisClient.connect().catch((err) => console.log("Redis connection failed", err));
 
+let dlqProducer: any;
+
+const initDLQ = async (kafka: Kafka) => {
+  dlqProducer = kafka.producer();
+  await dlqProducer.connect();
+};
+
+const sendToDLQ = async (payload: any, reason: string) => {
+  await dlqProducer.send({
+    topic: "send-mail-failed",
+    messages: [{ value: JSON.stringify({ ...payload, reason, failedAt: new Date().toISOString() }) }],
+  });
+};
+
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
@@ -25,6 +39,8 @@ export const startSendMailConsumer = async () => {
       clientId: "mail-service",
       brokers: [process.env.Kafka_Broker || "localhost:9092"],
     });
+
+    await initDLQ(kafka);
 
     const consumer = kafka.consumer({ groupId: "mail-service-group" });
 
@@ -68,7 +84,8 @@ export const startSendMailConsumer = async () => {
           }
 
           if (!sent) {
-            console.log(`All retries failed for ${to} — skipping`);
+            console.log(`All retries failed for ${to} — sending to DLQ`);
+            await sendToDLQ({ to, subject, html }, "Max retries exceeded");
             return;
           }
 
