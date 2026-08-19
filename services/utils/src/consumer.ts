@@ -1,8 +1,23 @@
 import { Kafka } from "kafkajs";
 import nodemailer from "nodemailer";
+import { createClient } from "redis";
 import dotenv from "dotenv";
 
 dotenv.config();
+
+const redisClient = createClient({ url: process.env.Redis_url });
+
+redisClient.connect().catch((err) => console.log("Redis connection failed", err));
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 export const startSendMailConsumer = async () => {
   try {
@@ -15,28 +30,24 @@ export const startSendMailConsumer = async () => {
 
     await consumer.connect();
 
-    const topicName = "send-mail";
-
-    await consumer.subscribe({ topic: topicName, fromBeginning: false });
+    await consumer.subscribe({ topic: "send-mail", fromBeginning: false });
 
     console.log("✅ Mail service consumer started, listening for sending mail");
 
     await consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
+      eachMessage: async ({ partition, message }) => {
         try {
+          const messageId = `mail:${partition}:${message.offset}`;
+
+          const alreadyProcessed = await redisClient.get(messageId);
+          if (alreadyProcessed) {
+            console.log(`Skipping duplicate message: ${messageId}`);
+            return;
+          }
+
           const { to, subject, html } = JSON.parse(
             message.value?.toString() || "{}"
           );
-
-          const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 465,
-            secure: true,
-            auth: {
-              user: process.env.SMTP_USER,
-              pass: process.env.SMTP_PASS,
-            },
-          });
 
           await transporter.sendMail({
             from: "Hireheaven <no-reply>",
@@ -44,6 +55,9 @@ export const startSendMailConsumer = async () => {
             subject,
             html,
           });
+
+          // mark as processed — TTL 7 days (Kafka default retention)
+          await redisClient.set(messageId, "1", { EX: 60 * 60 * 24 * 7 });
 
           console.log(`Mail has been sent to ${to}`);
         } catch (error) {
