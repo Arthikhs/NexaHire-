@@ -49,12 +49,28 @@ export const startSendMailConsumer = async () => {
             message.value?.toString() || "{}"
           );
 
-          await transporter.sendMail({
-            from: "Hireheaven <no-reply>",
-            to,
-            subject,
-            html,
-          });
+          let sent = false;
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+              await transporter.sendMail({
+                from: "Hireheaven <no-reply>",
+                to,
+                subject,
+                html,
+              });
+              sent = true;
+              break;
+            } catch (err) {
+              if (attempt < 3) {
+                await new Promise((r) => setTimeout(r, 1000 * 2 ** (attempt - 1)));
+              }
+            }
+          }
+
+          if (!sent) {
+            console.log(`All retries failed for ${to} — skipping`);
+            return;
+          }
 
           // mark as processed — TTL 7 days (Kafka default retention)
           await redisClient.set(messageId, "1", { EX: 60 * 60 * 24 * 7 });
