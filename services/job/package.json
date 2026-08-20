@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
+    "postgres": "^3.4.4",
     "@types/kafkajs": "^1.9.0",
     "axios": "^1.13.2",
     "cors": "^2.8.5",

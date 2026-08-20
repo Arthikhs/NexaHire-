@@ -8,7 +8,7 @@
     "dev": "concurrently \"tsc -w\" \"nodemon dist/index.js\""
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
+    "postgres": "^3.4.4",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",

@@ -23,7 +23,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
+    "postgres": "^3.4.4",
     "@types/axios": "^0.14.4",
     "@types/jsonwebtoken": "^9.0.10",
     "axios": "^1.13.2",
