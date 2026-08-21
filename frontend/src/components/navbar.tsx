@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Bell, Bookmark, BarChart3, Briefcase, CheckCheck, Home, Info, LogOut, Menu, MessageSquarePlus, User, X, KanbanSquare, Building2, BookOpen, Target, FileEdit, Mic, BrainCircuit, FileSearch } from "lucide-react";
@@ -72,9 +72,7 @@ const NavBar = () => {
   useEffect(() => {
     if (isAuth) {
       fetchNotifications();
-
       const ws = new WebSocket(`ws://localhost:5003/ws?token=${token}`);
-
       ws.onmessage = (e) => {
         const data = JSON.parse(e.data);
         if (data.type === "notification") {
@@ -88,7 +86,6 @@ const NavBar = () => {
           }, ...prev]);
         }
       };
-
       return () => ws.close();
     }
   }, [isAuth]);
@@ -100,7 +97,7 @@ const NavBar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <Link href={"/"} className="flex items-center gap-1 group">
+            <Link to="/" className="flex items-center gap-1 group">
               <div className="text-2xl font-bold tracking-tight">
                 <span className="bg-linear-to-r from bg-blue-600 to-blue-800 bg-clip-text text-transparent">Nexa</span>
                 <span className="text-red-500">Hire</span>
@@ -110,11 +107,11 @@ const NavBar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            <Link href={"/"}><Button variant="ghost" className="flex items-center gap-2 font-medium"><Home size={16} /> Home</Button></Link>
-            <Link href={"/jobs"}><Button variant="ghost" className="flex items-center gap-2 font-medium"><Briefcase size={16} /> Jobs</Button></Link>
-            <Link href={"/insights"}><Button variant="ghost" className="flex items-center gap-2 font-medium"><Building2 size={16} /> Insights</Button></Link>
-            <Link href={"/questions"}><Button variant="ghost" className="flex items-center gap-2 font-medium"><BookOpen size={16} /> Questions</Button></Link>
-            <Link href={"/about"}><Button variant="ghost" className="flex items-center gap-2 font-medium"><Info size={16} /> About</Button></Link>
+            <Link to="/"><Button variant="ghost" className="flex items-center gap-2 font-medium"><Home size={16} /> Home</Button></Link>
+            <Link to="/jobs"><Button variant="ghost" className="flex items-center gap-2 font-medium"><Briefcase size={16} /> Jobs</Button></Link>
+            <Link to="/insights"><Button variant="ghost" className="flex items-center gap-2 font-medium"><Building2 size={16} /> Insights</Button></Link>
+            <Link to="/questions"><Button variant="ghost" className="flex items-center gap-2 font-medium"><BookOpen size={16} /> Questions</Button></Link>
+            <Link to="/about"><Button variant="ghost" className="flex items-center gap-2 font-medium"><Info size={16} /> About</Button></Link>
           </div>
 
           {/* Right side Actions */}
@@ -123,7 +120,6 @@ const NavBar = () => {
               <>
                 {isAuth ? (
                   <div className="flex items-center gap-2">
-                    {/* Notification Bell */}
                     <Popover open={notifOpen} onOpenChange={(v) => { setNotifOpen(v); if (v) fetchNotifications(); }}>
                       <PopoverTrigger asChild>
                         <button className="relative p-2 rounded-lg hover:bg-accent transition-colors">
@@ -166,7 +162,6 @@ const NavBar = () => {
                       </PopoverContent>
                     </Popover>
 
-                    {/* Profile */}
                     <Popover>
                       <PopoverTrigger asChild>
                         <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -183,35 +178,17 @@ const NavBar = () => {
                           <p className="text-sm font-semibold">{user && user.name}</p>
                           <p className="text-xs opacity-60 truncate">{user && user.email}</p>
                         </div>
-                        <Link href={"/account"}>
-                          <Button className="w-full justify-start gap-2" variant="ghost"><User size={16} /> My Profile</Button>
-                        </Link>
+                        <Link to="/account"><Button className="w-full justify-start gap-2" variant="ghost"><User size={16} /> My Profile</Button></Link>
                         {user?.role === "recruiter" && (
-                          <Link href={"/dashboard"}>
-                            <Button className="w-full justify-start gap-2" variant="ghost"><BarChart3 size={16} /> Dashboard</Button>
-                          </Link>
+                          <Link to="/dashboard"><Button className="w-full justify-start gap-2" variant="ghost"><BarChart3 size={16} /> Dashboard</Button></Link>
                         )}
-                        <Link href={"/tracker"}>
-                          <Button className="w-full justify-start gap-2" variant="ghost"><KanbanSquare size={16} /> App Tracker</Button>
-                        </Link>
-                        <Link href={"/skill-gap"}>
-                          <Button className="w-full justify-start gap-2" variant="ghost"><Target size={16} /> Skill Gap</Button>
-                        </Link>
-                        <Link href={"/cover-letter"}>
-                          <Button className="w-full justify-start gap-2" variant="ghost"><FileEdit size={16} /> Cover Letter</Button>
-                        </Link>
-                        <Link href={"/interview-feedback"}>
-                          <Button className="w-full justify-start gap-2" variant="ghost"><Mic size={16} /> Interview Feedback</Button>
-                        </Link>
-                        <Link href={"/salary-predictor"}>
-                          <Button className="w-full justify-start gap-2" variant="ghost"><BrainCircuit size={16} /> Salary Predictor</Button>
-                        </Link>
-                        <Link href={"/resume-score"}>
-                          <Button className="w-full justify-start gap-2" variant="ghost"><FileSearch size={16} /> Resume Score</Button>
-                        </Link>
-                        <Link href={"/saved"}>
-                          <Button className="w-full justify-start gap-2" variant="ghost"><Bookmark size={16} /> Saved Jobs</Button>
-                        </Link>
+                        <Link to="/tracker"><Button className="w-full justify-start gap-2" variant="ghost"><KanbanSquare size={16} /> App Tracker</Button></Link>
+                        <Link to="/skill-gap"><Button className="w-full justify-start gap-2" variant="ghost"><Target size={16} /> Skill Gap</Button></Link>
+                        <Link to="/cover-letter"><Button className="w-full justify-start gap-2" variant="ghost"><FileEdit size={16} /> Cover Letter</Button></Link>
+                        <Link to="/interview-feedback"><Button className="w-full justify-start gap-2" variant="ghost"><Mic size={16} /> Interview Feedback</Button></Link>
+                        <Link to="/salary-predictor"><Button className="w-full justify-start gap-2" variant="ghost"><BrainCircuit size={16} /> Salary Predictor</Button></Link>
+                        <Link to="/resume-score"><Button className="w-full justify-start gap-2" variant="ghost"><FileSearch size={16} /> Resume Score</Button></Link>
+                        <Link to="/saved"><Button className="w-full justify-start gap-2" variant="ghost"><Bookmark size={16} /> Saved Jobs</Button></Link>
                         <Button className="w-full justify-start gap-2 mt-1" variant="ghost" onClick={logoutUser}>
                           <LogOut size={16} /> Logout
                         </Button>
@@ -219,7 +196,7 @@ const NavBar = () => {
                     </Popover>
                   </div>
                 ) : (
-                  <Link href={"/login"}>
+                  <Link to="/login">
                     <Button className="gap-2"><User size={16} /> Sign In</Button>
                   </Link>
                 )}
@@ -241,18 +218,18 @@ const NavBar = () => {
       {/* Mobile view */}
       <div className={`md:hidden border-t overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-96 opacity-100" : "max-h-0 opacity-0"}`}>
         <div className="px-3 py-3 space-y-1 bg-background/95 backdrop-blur-md">
-          <Link href={"/"} onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><Home size={18} /> Home</Button></Link>
-          <Link href={"/jobs"} onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><Briefcase size={18} /> Jobs</Button></Link>
-          <Link href={"/insights"} onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><Building2 size={18} /> Insights</Button></Link>
-          <Link href={"/questions"} onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><BookOpen size={18} /> Questions</Button></Link>
-          <Link href={"/skill-gap"} onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><Target size={18} /> Skill Gap</Button></Link>
-          <Link href={"/about"} onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><Info size={18} /> About</Button></Link>
-          <Link href={"/experiences"} onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><MessageSquarePlus size={18} /> Experiences</Button></Link>
+          <Link to="/" onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><Home size={18} /> Home</Button></Link>
+          <Link to="/jobs" onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><Briefcase size={18} /> Jobs</Button></Link>
+          <Link to="/insights" onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><Building2 size={18} /> Insights</Button></Link>
+          <Link to="/questions" onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><BookOpen size={18} /> Questions</Button></Link>
+          <Link to="/skill-gap" onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><Target size={18} /> Skill Gap</Button></Link>
+          <Link to="/about" onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><Info size={18} /> About</Button></Link>
+          <Link to="/experiences" onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><MessageSquarePlus size={18} /> Experiences</Button></Link>
           {isAuth ? (
             <>
-              <Link href={"/account"} onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><User size={18} /> My Profile</Button></Link>
-              <Link href={"/tracker"} onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><KanbanSquare size={18} /> App Tracker</Button></Link>
-              <Link href={"/saved"} onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><Bookmark size={18} /> Saved Jobs</Button></Link>
+              <Link to="/account" onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><User size={18} /> My Profile</Button></Link>
+              <Link to="/tracker" onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><KanbanSquare size={18} /> App Tracker</Button></Link>
+              <Link to="/saved" onClick={toggleMenu}><Button variant="ghost" className="w-full justify-start gap-3 h-11"><Bookmark size={18} /> Saved Jobs</Button></Link>
               <Button variant="ghost" className="w-full justify-start gap-3 h-11 relative" onClick={toggleMenu}>
                 <Bell size={18} /> Notifications
                 {unreadCount > 0 && <span className="ml-auto h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">{unreadCount}</span>}
@@ -262,7 +239,7 @@ const NavBar = () => {
               </Button>
             </>
           ) : (
-            <Link href={"/login"} onClick={toggleMenu}><Button className="w-full justify-start gap-3 h-11 mt-2"><User size={18} /> SignIn</Button></Link>
+            <Link to="/login" onClick={toggleMenu}><Button className="w-full justify-start gap-3 h-11 mt-2"><User size={18} /> SignIn</Button></Link>
           )}
         </div>
       </div>

@@ -5,10 +5,10 @@ import React, { useEffect, useState } from "react";
 import Info from "./components/info";
 import Skills from "./components/skills";
 import Company from "./components/company";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import AppliedJobs from "./components/appliedJobs";
 import { Award, Bookmark, Briefcase } from "lucide-react";
-import Link from "next/link";
 
 const tabs = [
   { id: "applied", label: "Applied Jobs", icon: Briefcase },
@@ -19,11 +19,11 @@ const tabs = [
 const AccountPage = () => {
   const { isAuth, user, loading, applications, savedJobs } = useAppData();
   const [activeTab, setActiveTab] = useState("applied");
-  const router = useRouter();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuth && !loading) router.push("/login");
-  }, [isAuth, router, loading]);
+    if (!isAuth && !loading) navigate("/login");
+  }, [isAuth, navigate, loading]);
 
   if (loading) return <Loading />;
 
@@ -36,16 +36,13 @@ const AccountPage = () => {
 
             {user.role === "jobseeker" && (
               <>
-                {/* Tabs */}
                 <div className="flex gap-1 p-1 rounded-xl border bg-background w-fit">
                   {tabs.map(({ id, label, icon: Icon }) => (
                     <button
                       key={id}
                       onClick={() => setActiveTab(id)}
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        activeTab === id
-                          ? "bg-blue-600 text-white shadow-sm"
-                          : "opacity-60 hover:opacity-100"
+                        activeTab === id ? "bg-blue-600 text-white shadow-sm" : "opacity-60 hover:opacity-100"
                       }`}
                     >
                       <Icon size={15} /> {label}
@@ -63,7 +60,6 @@ const AccountPage = () => {
                   ))}
                 </div>
 
-                {/* Tab content */}
                 {activeTab === "applied" && <AppliedJobs applications={applications} />}
                 {activeTab === "skills" && <Skills user={user} isYourAccount={true} />}
                 {activeTab === "saved" && (
@@ -73,7 +69,7 @@ const AccountPage = () => {
                         {savedJobs.map((job) => (
                           <Link
                             key={job.job_id}
-                            href={`/jobs/${job.job_id}`}
+                            to={`/jobs/${job.job_id}`}
                             className="flex items-center gap-3 p-4 rounded-xl border-2 bg-background hover:border-blue-500 transition-all"
                           >
                             <div className="w-12 h-12 rounded-xl border overflow-hidden shrink-0">

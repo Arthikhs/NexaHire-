@@ -1,13 +1,13 @@
 "use client";
 import { auth_service, useAppData } from "@/context/AppContext";
 import axios from "axios";
-import { redirect } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import React, { FormEvent, useState } from "react";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import { Label } from "@/components/ui/label";
 import { ArrowRight, Lock, Mail } from "lucide-react";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Loading from "@/components/loading";
@@ -22,7 +22,8 @@ const LoginPage = () => {
 
   if (loading) return <Loading />;
 
-  if (isAuth) return redirect("/");
+  const navigate = useNavigate();
+  if (isAuth) { navigate("/"); return null; }
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,6 +45,7 @@ const LoginPage = () => {
       setUser(data.userObject);
       setIsAuth(true);
       fetchApplications();
+      navigate("/");
     } catch (error: any) {
       console.log(error);
       toast.error(error.response.data.message);
@@ -102,7 +104,7 @@ const LoginPage = () => {
 
             <div className="flex items-center justify-end">
               <Link
-                href={"/forgot"}
+                to="/forgot"
                 className="text-sm text-blue-500 hover:underline transition-all"
               >
                 Forgot Password?
@@ -119,7 +121,7 @@ const LoginPage = () => {
             <p className="text-center text-sm">
               Don't have an account?{" "}
               <Link
-                href={"/register"}
+                to="/register"
                 className="text-blue-500 font-medium hover:underline transition-all"
               >
                 Create a new account?

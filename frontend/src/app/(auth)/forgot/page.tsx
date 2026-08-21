@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { auth_service, useAppData } from "@/context/AppContext";
 import axios from "axios";
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import React, { FormEvent, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -14,7 +14,8 @@ const ForgotPage = () => {
   const [btnLoading, setbtnLoading] = useState(false);
   const { isAuth } = useAppData();
 
-  if (isAuth) return redirect("/");
+  const navigate = useNavigate();
+  if (isAuth) { navigate("/"); return null; }
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,7 +64,7 @@ const ForgotPage = () => {
 
         <Link
           className="mt-2 text-blue-500 underline text-sm ml-2"
-          href={"/login"}
+          to="/login"
         >
           Go to login page
         </Link>

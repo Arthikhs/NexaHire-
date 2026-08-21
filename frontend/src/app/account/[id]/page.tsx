@@ -2,7 +2,7 @@
 import { user_service } from "@/context/AppContext";
 import { User } from "@/type";
 import axios from "axios";
-import { useParams } from "next/navigation";
+import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import Loading from "@/components/loading";
@@ -12,18 +12,14 @@ import Skills from "../components/skills";
 const UserAccount = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
 
   async function fetchUser() {
     const token = Cookies.get("token");
     try {
       const { data } = await axios.get(`${user_service}/api/user/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       setUser(data);
     } catch (error) {
       console.log(error);
@@ -32,9 +28,7 @@ const UserAccount = () => {
     }
   }
 
-  useEffect(() => {
-    fetchUser();
-  }, [id]);
+  useEffect(() => { fetchUser(); }, [id]);
 
   if (loading) return <Loading />;
   return (
@@ -42,9 +36,7 @@ const UserAccount = () => {
       {user && (
         <div className="w-[90%] md:w-[60%] m-auto">
           <Info user={user} isYourAccount={false} />
-          {user.role === "jobseeker" && (
-            <Skills user={user} isYourAccount={false} />
-          )}
+          {user.role === "jobseeker" && <Skills user={user} isYourAccount={false} />}
         </div>
       )}
     </>

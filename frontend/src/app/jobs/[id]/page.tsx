@@ -25,16 +25,16 @@ import {
   Users,
   XCircle,
 } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 const JobPage = () => {
   const { id } = useParams();
   const { user, applyJob, applications, btnLoading, savedJobIds, toggleSaveJob } = useAppData();
-  const router = useRouter();
+  const navigate = useNavigate();
   const token = Cookies.get("token");
 
   const [job, setJob] = useState<Job | null>(null);
@@ -133,7 +133,7 @@ const JobPage = () => {
         <div className="max-w-6xl mx-auto px-4 py-8">
           {/* Back button */}
           <button
-            onClick={() => router.back()}
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-sm opacity-60 hover:opacity-100 mb-6 transition-opacity"
           >
             <ArrowLeft size={16} /> Back to Jobs
@@ -147,7 +147,7 @@ const JobPage = () => {
                 <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-8">
                   <div className="flex items-start gap-4 flex-wrap">
                     {/* Company logo */}
-                    <Link href={`/company/${job.company_id}`}>
+                    <Link to={`/company/${job.company_id}`}>
                       <div className="w-16 h-16 rounded-xl border-2 border-white/30 overflow-hidden bg-white shrink-0 hover:scale-105 transition-transform">
                         <img src={job.company_logo} alt={job.company_name} className="w-full h-full object-cover" />
                       </div>
@@ -165,7 +165,7 @@ const JobPage = () => {
                         </span>
                       </div>
                       <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">{job.title}</h1>
-                      <Link href={`/company/${job.company_id}`} className="flex items-center gap-1.5 text-blue-200 hover:text-white transition-colors text-sm">
+                      <Link to={`/company/${job.company_id}`} className="flex items-center gap-1.5 text-blue-200 hover:text-white transition-colors text-sm">
                         <Building2 size={15} /> {job.company_name} <ExternalLink size={12} />
                       </Link>
                     </div>
@@ -239,10 +239,10 @@ const JobPage = () => {
                           </div>
 
                           <div className="flex gap-3 mb-3">
-                            <Link target="_blank" href={e.resume} className="flex items-center gap-1.5 text-blue-500 hover:underline text-sm">
+                            <a target="_blank" href={e.resume} className="flex items-center gap-1.5 text-blue-500 hover:underline text-sm" rel="noreferrer">
                               <FileText size={14} /> View Resume
-                            </Link>
-                            <Link target="_blank" href={`/account/${e.applicant_id}`} className="flex items-center gap-1.5 text-blue-500 hover:underline text-sm">
+                            </a>
+                            <Link to={`/account/${e.applicant_id}`} className="flex items-center gap-1.5 text-blue-500 hover:underline text-sm" target="_blank">
                               <Users size={14} /> View Profile
                             </Link>
                           </div>
@@ -307,7 +307,7 @@ const JobPage = () => {
                     </button>
                   </>
                 ) : !user ? (
-                  <Link href="/login">
+                  <Link to="/login">
                     <Button className="w-full h-12 gap-2">
                       <Briefcase size={18} /> Login to Apply
                     </Button>
@@ -423,7 +423,7 @@ const JobPage = () => {
               {/* Company card */}
               <Card className="border-2 p-6">
                 <h3 className="font-bold text-base mb-4">About the Company</h3>
-                <Link href={`/company/${job.company_id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <Link to={`/company/${job.company_id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                   <div className="w-12 h-12 rounded-xl border overflow-hidden bg-background shrink-0">
                     <img src={job.company_logo} alt={job.company_name} className="w-full h-full object-cover" />
                   </div>
