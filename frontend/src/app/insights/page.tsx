@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { insights_service } from "@/context/AppContext";
 import { useAppData } from "@/context/AppContext";
 import Loading from "@/components/loading";
@@ -37,7 +37,7 @@ interface SalaryTrend {
 const InsightsPage = () => {
   const { isAuth, user } = useAppData();
   const token = Cookies.get("token");
-  const router = useRouter();
+  const navigate = useNavigate();
 
   // Salary search
   const [company, setCompany] = useState("");
@@ -79,7 +79,7 @@ const InsightsPage = () => {
   useEffect(() => { searchSalaries(); }, []);
 
   async function handleSubmitSalary() {
-    if (!isAuth) { router.push("/login"); return; }
+    if (!isAuth) { navigate("/login"); return; }
     if (!submitForm.company_name || !submitForm.role || !submitForm.salary || submitForm.experience_years === "") {
       toast.error("Please fill required fields"); return;
     }
@@ -115,7 +115,7 @@ const InsightsPage = () => {
             <Button variant="outline" onClick={() => setShowSubmitForm(!showSubmitForm)} className="gap-2">
               <DollarSign size={16} /> Share Salary
             </Button>
-            <Link href="/insights/search">
+            <Link to="/insights/search">
               <Button variant="outline" className="gap-2">
                 <Building2 size={16} /> Company Search
               </Button>
@@ -247,7 +247,7 @@ const InsightsPage = () => {
                   {salaryRows.map((row, i) => (
                     <tr key={i} className="border-b hover:bg-accent transition-colors">
                       <td className="py-3 px-4">
-                        <Link href={`/insights/${encodeURIComponent(row.company_name)}`}
+                        <Link to={`/insights/${encodeURIComponent(row.company_name)}`}
                           className="font-medium text-blue-600 hover:underline flex items-center gap-1">
                           {row.company_name} <ChevronRight size={12} />
                         </Link>

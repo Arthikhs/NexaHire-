@@ -1,5 +1,5 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams } from "react-router-dom";
 import Cookies from "js-cookie";
 import React, { useEffect, useRef, useState } from "react";
 import { job_service, useAppData } from "@/context/AppContext";
@@ -7,7 +7,7 @@ import { Company, CompanyReview, Job } from "@/type";
 import axios from "axios";
 import Loading from "@/components/loading";
 import { Card } from "@/components/ui/card";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Briefcase,
@@ -220,9 +220,9 @@ const CompanyPage = () => {
                     </div>
                   )}
                 </div>
-                <Link href={company.website} target="_blank" className="md:mb-4">
+                <a href={company.website} target="_blank" rel="noreferrer" className="md:mb-4">
                   <Button className="gap-2"><Globe size={18} /> Visit Website</Button>
-                </Link>
+                </a>
               </div>
             </div>
           </Card>
@@ -338,7 +338,7 @@ const CompanyPage = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Link href={`/jobs/${j.job_id}`}>
+                            <Link to={`/jobs/${j.job_id}`}>
                               <Button variant="outline" size="sm" className="gap-2"><Eye size={16} /> View</Button>
                             </Link>
                             {isRecruiterOwner && (

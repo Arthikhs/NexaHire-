@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { tracker_service } from "@/context/AppContext";
 import { useAppData } from "@/context/AppContext";
 import Loading from "@/components/loading";
@@ -67,7 +67,7 @@ const statusStyle: Record<string, string> = {
 
 const TrackerPage = () => {
   const { user, loading: authLoading, isAuth } = useAppData();
-  const router = useRouter();
+  const navigate = useNavigate();
   const token = Cookies.get("token");
 
   const [stats, setStats] = useState<Stats | null>(null);
@@ -78,7 +78,7 @@ const TrackerPage = () => {
   const [dragging, setDragging] = useState<{ cardId: number; fromCol: number } | null>(null);
 
   useEffect(() => {
-    if (!authLoading && (!isAuth || user?.role !== "jobseeker")) router.push("/");
+    if (!authLoading && (!isAuth || user?.role !== "jobseeker")) navigate("/");
   }, [authLoading, isAuth, user]);
 
   async function fetchAll() {
@@ -201,7 +201,7 @@ const TrackerPage = () => {
                   </div>
                 )) : (
                   <div className="py-12 text-center opacity-50 text-sm">
-                    No applications yet. <Link href="/jobs" className="text-blue-600 hover:underline">Find jobs</Link>
+                    No applications yet. <Link to="/jobs" className="text-blue-600 hover:underline">Find jobs</Link>
                   </div>
                 )}
               </div>

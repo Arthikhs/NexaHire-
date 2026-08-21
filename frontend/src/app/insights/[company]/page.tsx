@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useParams } from "next/navigation";
-import Link from "next/link";
+import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { insights_service } from "@/context/AppContext";
 import { useAppData } from "@/context/AppContext";
 import Loading from "@/components/loading";
@@ -83,7 +83,7 @@ const CompanyInsightPage = () => {
   return (
     <div className="min-h-screen bg-secondary/30">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <Link href="/insights" className="flex items-center gap-1 text-sm opacity-60 hover:opacity-100 mb-6">
+        <Link to="/insights" className="flex items-center gap-1 text-sm opacity-60 hover:opacity-100 mb-6">
           <ChevronLeft size={16} /> Back to Insights
         </Link>
 
@@ -230,7 +230,7 @@ const CompanyInsightPage = () => {
               </div>
               <div className="divide-y">
                 {data.openJobs.length > 0 ? data.openJobs.map((j) => (
-                  <Link key={j.job_id} href={`/jobs/${j.job_id}`}
+                  <Link key={j.job_id} to={`/jobs/${j.job_id}`}
                     className="block p-4 hover:bg-accent transition-colors">
                     <p className="text-sm font-medium">{j.title}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
